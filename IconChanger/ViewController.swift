@@ -8,48 +8,30 @@
 
 import UIKit
 
-class ViewController: UIViewController {
+class ViewController: UITableViewController {
 
-    let changeButtonView: UIButton = {
-        let changeButton = UIButton()
-        changeButton.setTitle("Change", for: .normal)
-        changeButton.backgroundColor = UIColor.gray
-        changeButton.translatesAutoresizingMaskIntoConstraints = false
-        changeButton.addTarget(self, action: #selector(handleChangeButton), for: .touchUpInside)
-        return changeButton
-    }()
+    let cellId = "cellId"
+    let iconArr = ["Aicon", "Bicon", "Cicon"]
     
-    func handleChangeButton() {
+    func handleChangeButton(name: String) {
         guard UIApplication.shared.supportsAlternateIcons else {
             return
         }
-        
-        if UIApplication.shared.alternateIconName == "Aicon" {
-            UIApplication.shared.setAlternateIconName("Bicon"){ error in
-                if let error = error {
-                    print(error.localizedDescription)
-                }
-            }
-        }
-        else {
-            UIApplication.shared.setAlternateIconName("Aicon"){ error in
-                if let error = error {
-                    print(error.localizedDescription)
-                }
+    
+        UIApplication.shared.setAlternateIconName(name){ error in
+            if let error = error {
+                print(error.localizedDescription)
             }
         }
     }
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.addSubview(changeButtonView)
         
-        //ios10 contrains x,y,width, height
-        
-        changeButtonView.centerXAnchor.constraint(equalTo: self.view.centerXAnchor).isActive = true
-        changeButtonView.centerYAnchor.constraint(equalTo: self.view.centerYAnchor).isActive = true
-        changeButtonView.widthAnchor.constraint(equalToConstant: 100).isActive = true
-        changeButtonView.heightAnchor.constraint(equalToConstant: 50).isActive = true
+        self.tableView.delegate = self
+        self.tableView.dataSource = self
+        self.tableView.contentInset = UIEdgeInsets(top: 20,left: 0,bottom: 0,right: 0)
+        self.tableView.register(IconCell.self, forCellReuseIdentifier: cellId)
     }
 
     override func didReceiveMemoryWarning() {
@@ -57,6 +39,28 @@ class ViewController: UIViewController {
         // Dispose of any resources that can be recreated.
     }
 
-
+    override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let cell = tableView.dequeueReusableCell(withIdentifier: cellId, for: indexPath) as! IconCell
+        cell.iconImageView.image = UIImage(named: iconArr[indexPath.row])
+        cell.textLabel?.text = iconArr[indexPath.row]
+        cell.selectionStyle = .none
+        return cell
+    }
+    
+    override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        return iconArr.count
+    }
+    
+    override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        return 60
+    }
+    
+    override func numberOfSections(in tableView: UITableView) -> Int {
+        return 1
+    }
+    
+    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        handleChangeButton(name: iconArr[indexPath.row])
+    }
 }
 
