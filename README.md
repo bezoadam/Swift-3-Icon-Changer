@@ -1,0 +1,1 @@
+Simple example to change app icon programmatically using Swift 3.
